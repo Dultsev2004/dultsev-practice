@@ -1,8 +1,10 @@
+from django.contrib.auth import admin
 from django.db import models
 from django.urls import reverse
 import uuid
 from datetime import date
 from django.conf import settings
+from django.contrib.auth.models import User
 
 class Genre(models.Model):
     name = models.CharField(
@@ -96,13 +98,10 @@ class BookInstance(models.Model):
         permissions = (("can_mark_returned", "Set book as returned"),)
 
     def get_absolute_url(self):
-        """Returns the url to access a particular book instance."""
         return reverse('bookinstance-detail', args=[str(self.id)])
 
     def __str__(self):
-        """String for representing the Model object."""
         return f'{self.id} ({self.book.title})'
-
 
 class Author(models.Model):
     first_name = models.CharField(max_length=100)
@@ -117,5 +116,4 @@ class Author(models.Model):
         return reverse('author-detail', args=[str(self.id)])
 
     def __str__(self):
-        """String for representing the Model object."""
         return f'{self.last_name}, {self.first_name}'
