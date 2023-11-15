@@ -6,6 +6,7 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User
 
+
 class Genre(models.Model):
     name = models.CharField(
         max_length=200,
@@ -97,6 +98,7 @@ class BookInstance(models.Model):
 
     def __str__(self):
         return f'{self.id} ({self.book.title})'
+
 
 class Author(models.Model):
     first_name = models.CharField(max_length=100)
