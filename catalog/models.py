@@ -1,19 +1,19 @@
-from django.contrib.auth import admin
 from django.db import models
 from django.urls import reverse
 import uuid
 from datetime import date
 from django.conf import settings
-from django.contrib.auth.models import User
 
 
 class Genre(models.Model):
+    """Модель для представления жанра книги"""
     name = models.CharField(
         max_length=200,
         unique=True,
         help_text="Enter a book genre (e.g. Science Fiction, French Poetry etc.)"
     )
 
+    """Метод для получения абсолютного URL для детальной страницы жанра"""
     def get_absolute_url(self):
         return reverse('genre-detail', args=[str(self.id)])
 
@@ -22,10 +22,12 @@ class Genre(models.Model):
 
 
 class Language(models.Model):
+    """Модель для представления языка книги"""
     name = models.CharField(max_length=200,
                             unique=True,
                             help_text="Enter the book's natural language (e.g. English, French, Japanese etc.)")
 
+    """Метод для получения абсолютного URL для детальной страницы языка"""
     def get_absolute_url(self):
         return reverse('language-detail', args=[str(self.id)])
 
@@ -34,6 +36,7 @@ class Language(models.Model):
 
 
 class Book(models.Model):
+    """Модель для представления книги"""
     title = models.CharField(max_length=200)
     author = models.ForeignKey('Author', on_delete=models.RESTRICT, null=True)
     summary = models.TextField(
@@ -50,11 +53,13 @@ class Book(models.Model):
     class Meta:
         ordering = ['title', 'author']
 
+    """Метод для отображения жанров книги в админке"""
     def display_genre(self):
         return ', '.join([genre.name for genre in self.genre.all()[:3]])
 
     display_genre.short_description = 'Genre'
 
+    """Метод для получения абсолютного URL для детальной страницы книги"""
     def get_absolute_url(self):
         return reverse('book-detail', args=[str(self.id)])
 
@@ -63,6 +68,7 @@ class Book(models.Model):
 
 
 class BookInstance(models.Model):
+    """Модель для представления экземпляра книги в библиотеке"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4,
                           help_text="Unique ID for this particular book across whole library")
     book = models.ForeignKey('Book', on_delete=models.RESTRICT, null=True)
@@ -71,10 +77,12 @@ class BookInstance(models.Model):
     borrower = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
 
+    """Свойство для проверки, просрочена ли книга"""
     @property
     def is_overdue(self):
         return bool(self.due_back and date.today() > self.due_back)
 
+    """Варианты статусов экземпляра книги"""
     LOAN_STATUS = (
         ('d', 'Maintenance'),
         ('o', 'On loan'),
@@ -93,6 +101,7 @@ class BookInstance(models.Model):
         ordering = ['due_back']
         permissions = (("can_mark_returned", "Set book as returned"),)
 
+    """Метод для получения абсолютного URL для детальной страницы экземпляра книги"""
     def get_absolute_url(self):
         return reverse('bookinstance-detail', args=[str(self.id)])
 
@@ -101,6 +110,7 @@ class BookInstance(models.Model):
 
 
 class Author(models.Model):
+    """Модель для представления автора книги"""
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     date_of_birth = models.DateField(null=True, blank=True)
@@ -109,6 +119,7 @@ class Author(models.Model):
     class Meta:
         ordering = ['last_name', 'first_name']
 
+    """Метод для получения абсолютного URL для детальной страницы автора"""
     def get_absolute_url(self):
         return reverse('author-detail', args=[str(self.id)])
 
